@@ -7,7 +7,8 @@
       "Bash(./venv/Scripts/python.exe -m tests.smoke_payload)",
       "Bash(./venv/Scripts/python.exe -c ' *)",
       "Bash(./venv/Scripts/python.exe -m src.upload output/test_upload --dry-run)",
-      "Bash(./venv/Scripts/python.exe -m src.upload output/test_upload)"
+      "Bash(./venv/Scripts/python.exe -m src.upload output/test_upload)",
+      "Bash(./venv/Scripts/python.exe -m src.gui)"
     ]
   }
 }

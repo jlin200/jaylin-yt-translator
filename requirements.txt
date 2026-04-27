@@ -1,3 +1,4 @@
+altgraph==0.17.5
 annotated-types==0.7.0
 certifi==2026.4.22
 cffi==2.0.0
@@ -17,6 +18,9 @@ grpcio-status==1.71.2
 httplib2==0.31.2
 idna==3.13
 oauthlib==3.3.1
+packaging==26.2
+pefile==2024.8.26
+pillow==12.2.0
 proto-plus==1.27.2
 protobuf==5.29.6
 pyasn1==0.6.3
@@ -24,10 +28,18 @@ pyasn1_modules==0.4.2
 pycparser==3.0
 pydantic==2.13.3
 pydantic_core==2.46.3
+pyinstaller==6.20.0
+pyinstaller-hooks-contrib==2026.4
 pyparsing==3.3.2
+PySide6==6.11.0
+PySide6_Addons==6.11.0
+PySide6_Essentials==6.11.0
 python-dotenv==1.2.2
+pywin32-ctypes==0.2.3
 requests==2.33.1
 requests-oauthlib==2.0.0
+setuptools==82.0.1
+shiboken6==6.11.0
 tqdm==4.67.3
 typing-inspection==0.4.2
 typing_extensions==4.15.0

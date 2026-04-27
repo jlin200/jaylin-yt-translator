@@ -7,6 +7,7 @@
 """
 from __future__ import annotations
 
+import re
 from pathlib import Path
 from typing import Callable
 
@@ -83,3 +84,66 @@ def set_thumbnail(service, video_id: str, thumbnail_path: Path) -> None:
     """
     media = MediaFileUpload(str(thumbnail_path))
     service.thumbnails().set(videoId=video_id, media_body=media).execute()
+
+
+# ===== URL 기반 메타데이터 갱신 (GUI 워크플로우) =====
+
+_VIDEO_ID_FROM_URL = re.compile(
+    r"(?:v=|/v/|youtu\.be/|/embed/|/shorts/)([A-Za-z0-9_-]{11})"
+)
+_VIDEO_ID_BARE = re.compile(r"^([A-Za-z0-9_-]{11})$")
+
+
+def extract_video_id(text: str) -> str | None:
+    """URL 또는 11자 ID에서 videoId 추출.
+
+    매칭 패턴:
+        https://youtube.com/watch?v=XXX
+        https://www.youtube.com/watch?v=XXX
+        https://youtu.be/XXX
+        https://youtube.com/shorts/XXX
+        XXX (11자 단독)
+
+    Returns:
+        videoId (11자) 또는 None (매칭 실패).
+    """
+    text = (text or "").strip()
+    if not text:
+        return None
+    m = _VIDEO_ID_BARE.match(text)
+    if m:
+        return m.group(1)
+    m = _VIDEO_ID_FROM_URL.search(text)
+    if m:
+        return m.group(1)
+    return None
+
+
+def update_localizations(
+    service,
+    video_id: str,
+    snippet: dict,
+    localizations: dict,
+) -> None:
+    """videos.update — snippet + localizations 갱신 (영상 자체 미수정).
+
+    Args:
+        service       : build_service() 반환값
+        video_id      : 11자 videoId
+        snippet       : title/description/categoryId/defaultLanguage 포함 dict (categoryId 필수)
+        localizations : {"en": {"title", "description"}, ...}
+
+    쿼터: 50 units.
+
+    Raises:
+        googleapiclient.errors.HttpError
+    """
+    body = {
+        "id": video_id,
+        "snippet": snippet,
+        "localizations": localizations,
+    }
+    service.videos().update(
+        part="snippet,localizations",
+        body=body,
+    ).execute()
