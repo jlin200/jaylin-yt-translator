@@ -1,0 +1,17 @@
+{
+  "source": "ko",
+  "tiers": {
+    "1": ["en", "ja", "th", "vi", "zh-TW", "pt-BR"],
+    "2": [
+      "zh-CN", "id", "ms", "es",
+      "fr", "de", "it", "ru", "ar", "tr", "hi", "pl", "nl", "sv", "uk"
+    ],
+    "3": [
+      "fa",
+      "da", "no", "fi", "cs", "hu", "el", "ro", "bg", "sk", "hr",
+      "sr", "sl", "lt", "lv", "et", "is", "ga", "mt", "mk", "sq",
+      "ca",
+      "ta", "te", "bn", "ur", "mr", "km", "fil"
+    ]
+  }
+}
