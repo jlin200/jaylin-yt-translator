@@ -37,8 +37,10 @@
 
 ### 1️⃣ 파일 받기
 
-[GitHub Releases 페이지](https://github.com/YOUR-USERNAME/jaylin-yt-translator/releases)에서
-**`J-LIN-Studio.exe`** 파일을 받으시면 돼요! 90MB 정도예요. 📥
+👉 [📥 **J-LIN Studio 다운로드하기**](https://drive.google.com/file/d/1YV2K5TyVfKcdD4LOb_0B1BWyblwVzVJG/view?usp=sharing)
+
+위 링크 누르면 Google Drive로 이동해요. 거기서 **`J-LIN-Studio.exe`** 파일을 받으시면 돼요!
+파일 크기는 **약 90MB** 예요. 인터넷 빠르면 1~2분이면 받아요. ✨
 
 ### 2️⃣ 더블클릭으로 실행!
 
@@ -248,8 +250,9 @@ Korean title & description into up to 50 languages, registered as multi-locale m
 via the YouTube Data API.
 
 **Quick start**: Download `J-LIN-Studio.exe` from
-[Releases](https://github.com/YOUR-USERNAME/jaylin-yt-translator/releases) → double-click →
-follow the 3-step wizard (Google OAuth + Gemini API key) → paste video URL → done!
+[Google Drive](https://drive.google.com/file/d/1YV2K5TyVfKcdD4LOb_0B1BWyblwVzVJG/view?usp=sharing)
+→ double-click → follow the 3-step wizard (Google OAuth + Gemini API key) →
+paste video URL → done!
 
 Built with PySide6 + PyInstaller. ~90 MB single .exe. Korean UI.
 
