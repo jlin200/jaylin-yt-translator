@@ -63,12 +63,29 @@ Target languages: {languages_csv}
 Translation rules:
 1. Title: ≤100 characters per language (YouTube hard limit).
 2. Description: ≤5000 characters per language.
-3. Preserve emojis verbatim (🎵, 🎶, 📌, etc.).
-4. Preserve URLs verbatim (do not translate domain names or paths).
-5. Preserve hashtags (#ExampleTag) but translate the surrounding sentence naturally.
-6. Use idiomatic, native-speaker phrasing per locale (not literal translation).
-7. For music/playlist terms, use commonly searched terminology in that language.
-8. Tone: match the source emotional register (warm, encouraging, casual).
+
+3. CRITICAL — PRESERVE LINE BREAKS:
+   The source description uses literal newline characters (\\n).
+   You MUST keep the EXACT same line break structure in every translation.
+   Do not merge lines, do not insert extra blank lines, do not flatten paragraphs.
+   The line count of each translated description must match the source line count.
+
+4. CRITICAL — PRESERVE NON-KOREAN SEGMENTS VERBATIM:
+   The source may contain Korean mixed with English/numbers/symbols.
+   Translate ONLY the Korean portions. The following segments must appear EXACTLY as in the source — do not translate, transliterate, paraphrase, or modify them in any way:
+   - Time codes / track timestamps: "00:00", "1:23:45", "00:00 - Track Title", "[01:23] Song Name"
+   - English song / track / album / artist names (e.g., "Sunset Boulevard", "Dreamy Cafe Vibes", "Café del Mar")
+   - URLs (https://..., http://..., domain.com/path)
+   - Hashtags: #cafe, #LoFi (translate the surrounding sentence, but the hashtag tokens themselves stay verbatim)
+   - Email addresses
+   - Code snippets, command names, file paths, version numbers
+   - Numeric IDs and standalone numbers
+   - Emojis (🎵, 🎶, 📌, etc.) — keep position and order intact
+   When in doubt about a non-Korean segment, KEEP IT VERBATIM rather than translating.
+
+5. Use idiomatic, native-speaker phrasing per locale for the Korean parts (not literal translation).
+6. For music/playlist terms, use commonly searched terminology in that language.
+7. Tone: match the source emotional register (warm, encouraging, casual).
 
 Source title:
 {source_title}

@@ -470,6 +470,7 @@ imported by:
  &#8226;   <a href="#setuptools.extension">setuptools.extension</a>
  &#8226;   <a href="#setuptools.glob">setuptools.glob</a>
  &#8226;   <a href="#setuptools.wheel">setuptools.wheel</a>
+ &#8226;   <a href="#src.gui.error_dialog">src.gui.error_dialog</a>
  &#8226;   <a href="#tomllib._parser">tomllib._parser</a>
  &#8226;   <a href="#traceback">traceback</a>
  &#8226;   <a href="#tracemalloc">tracemalloc</a>
@@ -3333,6 +3334,7 @@ imports:
 imported by:
     <a href="#PySide6.QtWidgets">PySide6.QtWidgets</a>
  &#8226;   <a href="#src.gui.app">src.gui.app</a>
+ &#8226;   <a href="#src.gui.error_dialog">src.gui.error_dialog</a>
  &#8226;   <a href="#src.gui.main_window">src.gui.main_window</a>
  &#8226;   <a href="#src.gui.wizard">src.gui.wizard</a>
 
@@ -3747,6 +3749,7 @@ imported by:
  &#8226;   <a href="#setuptools.warnings">setuptools.warnings</a>
  &#8226;   <a href="#shiboken6.Shiboken">shiboken6.Shiboken</a>
  &#8226;   <a href="#src.gui.app">src.gui.app</a>
+ &#8226;   <a href="#src.gui.error_dialog">src.gui.error_dialog</a>
  &#8226;   <a href="#src.gui.main_window">src.gui.main_window</a>
  &#8226;   <a href="#src.gui.paths">src.gui.paths</a>
  &#8226;   <a href="#src.gui.style">src.gui.style</a>
@@ -10639,6 +10642,7 @@ imports:
     <a href="#_ctypes">_ctypes</a>
  &#8226;   <a href="#ctypes._endian">ctypes._endian</a>
  &#8226;   <a href="#ctypes.util">ctypes.util</a>
+ &#8226;   <a href="#ctypes.wintypes">ctypes.wintypes</a>
  &#8226;   <a href="#nt">nt</a>
  &#8226;   <a href="#os">os</a>
  &#8226;   <a href="#struct">struct</a>
@@ -10843,6 +10847,7 @@ imports:
 imported by:
     <a href="#_pyrepl.windows_console">_pyrepl.windows_console</a>
  &#8226;   <a href="#colorama.win32">colorama.win32</a>
+ &#8226;   <a href="#ctypes">ctypes</a>
  &#8226;   <a href="#ctypes.util">ctypes.util</a>
  &#8226;   <a href="#setuptools.windows_support">setuptools.windows_support</a>
 
@@ -28894,6 +28899,7 @@ imported by:
  &#8226;   <a href="#setuptools._vendor.importlib_metadata">setuptools._vendor.importlib_metadata</a>
  &#8226;   <a href="#setuptools.config._validate_pyproject.error_reporting">setuptools.config._validate_pyproject.error_reporting</a>
  &#8226;   <a href="#setuptools.msvc">setuptools.msvc</a>
+ &#8226;   <a href="#src.gui.upload_worker">src.gui.upload_worker</a>
  &#8226;   <a href="#src.gui.wizard">src.gui.wizard</a>
  &#8226;   <a href="#src.i18n.prompt">src.i18n.prompt</a>
  &#8226;   <a href="#src.i18n.translator">src.i18n.translator</a>
@@ -32967,7 +32973,6 @@ imported by:
  &#8226;   <a href="#setuptools.dist">setuptools.dist</a>
  &#8226;   <a href="#src.gui.main_window">src.gui.main_window</a>
  &#8226;   <a href="#src.gui.paths">src.gui.paths</a>
- &#8226;   <a href="#src.gui.upload_worker">src.gui.upload_worker</a>
  &#8226;   <a href="#src.gui.wizard">src.gui.wizard</a>
  &#8226;   <a href="#src.i18n.prompt">src.i18n.prompt</a>
  &#8226;   <a href="#src.upload.api">src.upload.api</a>
@@ -44385,6 +44390,7 @@ imports:
 imported by:
     <a href="#src.gui">src.gui</a>
  &#8226;   <a href="#src.gui.app">src.gui.app</a>
+ &#8226;   <a href="#src.gui.error_dialog">src.gui.error_dialog</a>
  &#8226;   <a href="#src.gui.main_window">src.gui.main_window</a>
  &#8226;   <a href="#src.gui.paths">src.gui.paths</a>
  &#8226;   <a href="#src.gui.style">src.gui.style</a>
@@ -44415,6 +44421,28 @@ imports:
   <div class="import">
 imported by:
     <a href="#gui_main.py">gui_main.py</a>
+ &#8226;   <a href="#src.gui.main_window">src.gui.main_window</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="src.gui.error_dialog"></a>
+  <a target="code" href="///C:/Users/user/my-projects/jaylin-yt-translator/src/gui/error_dialog.py" type="text/plain"><tt>src.gui.error_dialog</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#'collections.abc'">'collections.abc'</a>
+ &#8226;   <a href="#PySide6.QtWidgets">PySide6.QtWidgets</a>
+ &#8226;   <a href="#__future__">__future__</a>
+ &#8226;   <a href="#src.gui">src.gui</a>
+ &#8226;   <a href="#webbrowser">webbrowser</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#src.gui.main_window">src.gui.main_window</a>
+ &#8226;   <a href="#src.gui.upload_worker">src.gui.upload_worker</a>
 
   </div>
 
@@ -44432,9 +44460,12 @@ imports:
  &#8226;   <a href="#datetime">datetime</a>
  &#8226;   <a href="#pathlib">pathlib</a>
  &#8226;   <a href="#src.gui">src.gui</a>
+ &#8226;   <a href="#src.gui.app">src.gui.app</a>
+ &#8226;   <a href="#src.gui.error_dialog">src.gui.error_dialog</a>
  &#8226;   <a href="#src.gui.paths">src.gui.paths</a>
  &#8226;   <a href="#src.gui.style">src.gui.style</a>
  &#8226;   <a href="#src.gui.upload_worker">src.gui.upload_worker</a>
+ &#8226;   <a href="#src.gui.wizard">src.gui.wizard</a>
 
   </div>
   <div class="import">
@@ -44461,6 +44492,7 @@ imports:
 imported by:
     <a href="#src.gui.app">src.gui.app</a>
  &#8226;   <a href="#src.gui.main_window">src.gui.main_window</a>
+ &#8226;   <a href="#src.gui.upload_worker">src.gui.upload_worker</a>
  &#8226;   <a href="#src.gui.wizard">src.gui.wizard</a>
 
   </div>
@@ -44494,8 +44526,10 @@ imports:
     <a href="#PySide6.QtCore">PySide6.QtCore</a>
  &#8226;   <a href="#__future__">__future__</a>
  &#8226;   <a href="#googleapiclient.errors">googleapiclient.errors</a>
- &#8226;   <a href="#pathlib">pathlib</a>
+ &#8226;   <a href="#json">json</a>
  &#8226;   <a href="#src.gui">src.gui</a>
+ &#8226;   <a href="#src.gui.error_dialog">src.gui.error_dialog</a>
+ &#8226;   <a href="#src.gui.paths">src.gui.paths</a>
  &#8226;   <a href="#src.i18n.prompt">src.i18n.prompt</a>
  &#8226;   <a href="#src.i18n.translator">src.i18n.translator</a>
  &#8226;   <a href="#src.upload">src.upload</a>
@@ -44532,6 +44566,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#src.gui.app">src.gui.app</a>
+ &#8226;   <a href="#src.gui.main_window">src.gui.main_window</a>
 
   </div>
 
@@ -49348,6 +49383,7 @@ imports:
 imported by:
     <a href="#google_auth_oauthlib.flow">google_auth_oauthlib.flow</a>
  &#8226;   <a href="#pydoc">pydoc</a>
+ &#8226;   <a href="#src.gui.error_dialog">src.gui.error_dialog</a>
  &#8226;   <a href="#wsgiref.simple_server">wsgiref.simple_server</a>
 
   </div>

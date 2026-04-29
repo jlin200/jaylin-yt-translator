@@ -64,10 +64,37 @@ class SetupWizard(QDialog):
         self.setModal(True)
         self.resize(720, 600)
 
-        self._credentials_validated = False
-        self._gemini_key_validated = False
+        # 이미 등록된 항목은 통과 처리 (재실행 UX)
+        self._credentials_validated = paths.credentials_path().is_file()
+        self._gemini_key_validated = self._existing_gemini_key() is not None
 
         self._build_ui()
+        self._apply_existing_state()
+
+    @staticmethod
+    def _existing_gemini_key() -> str | None:
+        env_p = paths.env_path()
+        if not env_p.is_file():
+            return None
+        try:
+            for line in env_p.read_text(encoding="utf-8").splitlines():
+                if line.startswith("GEMINI_API_KEY="):
+                    val = line.split("=", 1)[1].strip()
+                    return val or None
+        except OSError:
+            return None
+        return None
+
+    def _apply_existing_state(self) -> None:
+        """기존 등록값을 폼에 반영."""
+        if self._credentials_validated:
+            self.credentials_status.setText(
+                f"✅ 등록된 인증서 사용 중\n{paths.credentials_path()}\n"
+                "(다시 등록하려면 위 버튼 클릭)"
+            )
+        existing_key = self._existing_gemini_key()
+        if existing_key:
+            self.gemini_key_input.setText(existing_key)
 
     # ===== UI =====
 

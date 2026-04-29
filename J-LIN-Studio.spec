@@ -2,10 +2,10 @@
 
 
 a = Analysis(
-    ['C:\\Users\\user\\my-projects\\jaylin-yt-translator\\gui_main.py'],
+    ['gui_main.py'],
     pathex=[],
     binaries=[],
-    datas=[('C:\\Users\\user\\my-projects\\jaylin-yt-translator\\src\\i18n\\languages.json', 'src/i18n'), ('C:\\Users\\user\\my-projects\\jaylin-yt-translator\\src\\gui\\assets\\logo.png', 'src/gui/assets'), ('C:\\Users\\user\\my-projects\\jaylin-yt-translator\\src\\gui\\assets\\icon.ico', 'src/gui/assets')],
+    datas=[('src/i18n/languages.json', 'src/i18n'), ('src/gui/assets/logo.png', 'src/gui/assets'), ('src/gui/assets/icon.ico', 'src/gui/assets')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
@@ -35,5 +35,5 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=['C:\\Users\\user\\my-projects\\jaylin-yt-translator\\src\\gui\\assets\\icon.ico'],
+    icon=['src\\gui\\assets\\icon.ico'],
 )

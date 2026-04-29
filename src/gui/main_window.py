@@ -10,11 +10,12 @@ from __future__ import annotations
 from datetime import datetime
 from pathlib import Path
 
-from PySide6.QtCore import Qt, QThread, QUrl
+from PySide6.QtCore import Qt, QThread, QTimer, QUrl
 from PySide6.QtGui import QDesktopServices, QDragEnterEvent, QDropEvent, QPixmap
 from PySide6.QtWidgets import (
     QCheckBox,
     QComboBox,
+    QDialog,
     QFrame,
     QHBoxLayout,
     QLabel,
@@ -22,14 +23,20 @@ from PySide6.QtWidgets import (
     QMainWindow,
     QProgressBar,
     QPushButton,
+    QScrollArea,
     QTextEdit,
     QVBoxLayout,
     QWidget,
 )
 
 from . import style
+from .error_dialog import ErrorCategory, ErrorDialog
 from .paths import resource_path
 from .upload_worker import UpdateWorker
+from .wizard import SetupWizard
+
+OAUTH_STAGE_TEXT = "YouTube 인증 중"
+OAUTH_TIMEOUT_MS = 45_000
 
 
 # (display, value, hint) — value는 SPEC-I18N-001 --tier 인자에 그대로 전달
@@ -77,6 +84,8 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.setWindowTitle("J-LIN Studio")
         self.resize(1100, 800)
+        # 1366×768 노트북 호환 — 작업표시줄 + 윈도우 데코 빼고 약 700px
+        self.setMinimumSize(960, 600)
         self.setAcceptDrops(True)
 
         # 결과 상태
@@ -85,6 +94,15 @@ class MainWindow(QMainWindow):
         self._watch_url: str | None = None
         self._thread: QThread | None = None
         self._worker: UpdateWorker | None = None
+
+        # OAuth 흐름 멈춤 감지 — 브라우저 "접근 차단됨" 페이지에서 사용자가
+        # 탭을 닫거나 그냥 두면 flow.run_local_server가 무한 대기 → 워커가
+        # OAUTH_TIMEOUT_MS 동안 stage가 "YouTube 인증 중"에 머물면 안내 다이얼로그.
+        self._oauth_timeout_timer = QTimer(self)
+        self._oauth_timeout_timer.setSingleShot(True)
+        self._oauth_timeout_timer.setInterval(OAUTH_TIMEOUT_MS)
+        self._oauth_timeout_timer.timeout.connect(self._on_oauth_timeout)
+        self._oauth_timeout_dialog: ErrorDialog | None = None
 
         self._build_ui()
 
@@ -104,7 +122,13 @@ class MainWindow(QMainWindow):
 
         root.addWidget(self._build_log_panel())
 
-        self.setCentralWidget(central)
+        # 작은 화면에서 세로 스크롤 가능하도록 QScrollArea로 래핑
+        scroll = QScrollArea()
+        scroll.setWidget(central)
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(QFrame.Shape.NoFrame)
+        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.setCentralWidget(scroll)
 
     # ===== Hero =====
 
@@ -175,7 +199,7 @@ class MainWindow(QMainWindow):
         inner.addWidget(_label("유튜브 본문"))
         self.description_input = QTextEdit()
         self.description_input.setPlaceholderText("한국어 설명")
-        self.description_input.setFixedHeight(140)
+        self.description_input.setMinimumHeight(100)
         inner.addWidget(self.description_input)
 
         # 번역 언어
@@ -282,7 +306,7 @@ class MainWindow(QMainWindow):
         self.result_area.setObjectName("logArea")
         self.result_area.setReadOnly(True)
         self.result_area.setPlaceholderText("작업 결과가 여기에 표시됩니다")
-        self.result_area.setFixedHeight(200)
+        self.result_area.setMinimumHeight(140)
         inner.addWidget(self.result_area)
 
         return panel
@@ -293,7 +317,16 @@ class MainWindow(QMainWindow):
         self.tier_hint.setText(TIER_OPTIONS[idx][2])
 
     def _on_settings_clicked(self) -> None:
-        self._append_log("[T2 placeholder] 환경 설정 마법사는 T3에서 통합됩니다.")
+        self._open_wizard()
+
+    def _open_wizard(self) -> None:
+        """SetupWizard 모달 실행 + accept 시 .env 재로드."""
+        dialog = SetupWizard(self)
+        if dialog.exec() == QDialog.DialogCode.Accepted:
+            from .app import _load_env
+
+            _load_env()
+            self._append_log(f"[{_now()}] ✓ 환경 설정 저장됨")
 
     def _on_open_studio(self) -> None:
         if self._studio_url:
@@ -308,7 +341,7 @@ class MainWindow(QMainWindow):
     def _on_start_clicked(self) -> None:
         url = self.url_input.text().strip()
         title = self.title_input.text().strip()
-        description = self.description_input.toPlainText().strip()
+        description = _normalize_newlines(self.description_input.toPlainText()).strip()
         tier = TIER_OPTIONS[self.tier_combo.currentIndex()][1]
 
         # 입력 검증
@@ -355,11 +388,16 @@ class MainWindow(QMainWindow):
 
     def _on_worker_stage(self, text: str) -> None:
         self.current_task.setText(text)
+        if text == OAUTH_STAGE_TEXT:
+            self._oauth_timeout_timer.start()
+        else:
+            self._stop_oauth_watcher()
 
     def _on_worker_log(self, text: str) -> None:
         self._append_log(f"[{_now()}] {text}")
 
     def _on_worker_done(self, result: dict) -> None:
+        self._stop_oauth_watcher()
         self._video_id = result["video_id"]
         self._studio_url = result["studio_url"]
         self._watch_url = result["watch_url"]
@@ -377,11 +415,70 @@ class MainWindow(QMainWindow):
         self.open_watch_btn.setEnabled(True)
         self._lock_ui(False)
 
-    def _on_worker_error(self, msg: str) -> None:
+    def _on_worker_error(self, category: str, msg: str) -> None:
+        self._stop_oauth_watcher()
         self._set_badge("오류", "status-error")
         self.current_task.setText("오류 발생")
-        self._append_log(f"[{_now()}] ❌ {msg}")
+        self._append_log(f"[{_now()}] ❌ [{category}] {msg}")
         self._lock_ui(False)
+
+        dialog = ErrorDialog(self, category, msg)
+        dialog.exec()
+        if dialog.requested_wizard:
+            self._open_wizard()
+
+    def _on_oauth_timeout(self) -> None:
+        """OAuth 흐름이 OAUTH_TIMEOUT_MS 넘게 응답 없음 — 친절 안내 (non-modal).
+
+        워커는 flow.run_local_server에서 계속 블록 중일 수 있음. 이 다이얼로그는
+        non-modal이라 워커가 늦게라도 성공하면 _on_worker_done에서 닫힘.
+        """
+        self._append_log(
+            f"[{_now()}] ⚠ OAuth 응답이 {OAUTH_TIMEOUT_MS // 1000}초 넘게 늦어요"
+        )
+        detail = (
+            f"브라우저 인증 응답이 {OAUTH_TIMEOUT_MS // 1000}초 넘게 오지 않고 있어요.\n"
+            "이런 경우일 가능성이 높아요:\n\n"
+            "  • 브라우저에 '접근 차단됨'이 떴다\n"
+            "    → Google Cloud Console에서 본인 Gmail을 '테스트 사용자'로 등록 필요\n\n"
+            "  • 인증 탭을 실수로 닫았다\n"
+            "    → 앱을 종료하고 다시 시작해주세요\n\n"
+            "  • Google 계정 선택 화면에서 멈춰 있다\n"
+            "    → 본인 유튜브 채널 계정을 선택해주세요\n\n"
+            "정상 인증되면 이 안내는 자동으로 닫혀요."
+        )
+        # 이전 다이얼로그가 떠 있으면 정리
+        if self._oauth_timeout_dialog is not None:
+            self._oauth_timeout_dialog.close()
+            self._oauth_timeout_dialog = None
+        dialog = ErrorDialog(
+            self, ErrorCategory.PERMISSION_DENIED, detail, modal=False
+        )
+        dialog.finished.connect(self._on_oauth_timeout_dialog_finished)
+        self._oauth_timeout_dialog = dialog
+        dialog.show()
+
+    def _on_oauth_timeout_dialog_finished(self, _result: int) -> None:
+        """non-modal OAuth 안내 다이얼로그 닫힘 처리.
+
+        사용자가 [환경 설정 다시 하기]를 누른 경우 마법사 재실행.
+        워커가 정상 완료/에러로 _stop_oauth_watcher가 close()를 호출한 경우는
+        requested_wizard=False이므로 무시됨.
+        """
+        dialog = self._oauth_timeout_dialog
+        if dialog is None:
+            return
+        self._oauth_timeout_dialog = None
+        if dialog.requested_wizard:
+            self._open_wizard()
+
+    def _stop_oauth_watcher(self) -> None:
+        """OAuth 타임아웃 타이머 정지 + 떠 있는 안내 다이얼로그 닫기."""
+        if self._oauth_timeout_timer.isActive():
+            self._oauth_timeout_timer.stop()
+        if self._oauth_timeout_dialog is not None:
+            self._oauth_timeout_dialog.close()
+            self._oauth_timeout_dialog = None
 
     # ===== 헬퍼 =====
 
@@ -435,3 +532,12 @@ class MainWindow(QMainWindow):
 
 def _now() -> str:
     return datetime.now().strftime("%H:%M:%S")
+
+
+def _normalize_newlines(text: str) -> str:
+    """QTextEdit.toPlainText()가 일부 환경에서 U+2028/U+2029를 반환 → \\n 통일.
+
+    Why: YouTube API 본문에 U+2028(line separator) / U+2029(paragraph separator)가
+    그대로 들어가면 일부 클라이언트에서 줄바꿈으로 렌더링 안 됨 → 한 줄로 보임.
+    """
+    return text.replace(" ", "\n").replace(" ", "\n").replace("\r\n", "\n")
